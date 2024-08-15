@@ -12,6 +12,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.51.23",
     "@web3modal/wagmi": "^5.0.11",
+    "ethers": "^5.7.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "viem": "^2.19.3",

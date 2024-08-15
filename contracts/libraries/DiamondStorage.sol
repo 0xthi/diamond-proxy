@@ -9,6 +9,7 @@ library DiamondStorage {
         address contractOwner;
         mapping(address => bool) admins;
         uint256 variable;
+        bool initialized;
     }
 
     function diamondStorage() internal pure returns (DiamondStorageStruct storage ds) {

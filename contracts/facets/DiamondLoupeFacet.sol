@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.20;
 
 import "../interfaces/IDiamondLoupe.sol";
 import "../Diamond.sol";
@@ -7,7 +7,7 @@ import "../Diamond.sol";
 contract DiamondLoupeFacet is IDiamondLoupe {
     Diamond private diamond;
 
-    constructor(address diamondAddress) {
+    constructor(address payable diamondAddress) {
         diamond = Diamond(diamondAddress);
     }
 

@@ -1,33 +1,40 @@
 const hre = require("hardhat");
 
 async function main() {
-  const [deployer] = await hre.ethers.getSigners();
+  const [superAdmin] = await hre.ethers.getSigners();
   
-  console.log("Deploying contracts with the account:", deployer.address);
+  console.log("Deploying contracts with the account:", superAdmin.address);
 
   // Deploy the Diamond contract
   const Diamond = await hre.ethers.getContractFactory("Diamond");
-  const diamond = await Diamond.deploy(deployer.address);  // Set deployer as the owner
+  const diamond = await Diamond.deploy(superAdmin.address);  // Set superAdmin as the owner
   await diamond.deployed();
 
   console.log("Diamond deployed to:", diamond.address);
 
-  // Deploy the facets
+  // Deploy ContractAFacet
   const ContractAFacet = await hre.ethers.getContractFactory("ContractAFacet");
-  const contractAFacet = await ContractAFacet.deploy();
+  const contractAFacet = await ContractAFacet.deploy();  // No arguments for constructor
   await contractAFacet.deployed();
 
   console.log("ContractAFacet deployed to:", contractAFacet.address);
 
-  // Define the facet cut to add ContractAFacet
+  // Deploy ContractBFacet
+  const ContractBFacet = await hre.ethers.getContractFactory("ContractBFacet");
+  const contractBFacet = await ContractBFacet.deploy();  // No arguments for constructor
+  await contractBFacet.deployed();
+
+  console.log("ContractBFacet deployed to:", contractBFacet.address);
+
+  // Add ContractAFacet to the Diamond
   const diamondCutTx = await diamond.diamondCut(
     [
       {
         facetAddress: contractAFacet.address,
         action: 0,  // Add
         functionSelectors: [
-          "0x5c60da1b", // Replace this with the correct selector for ContractAFacet.setter
-          "0x60d8f07e"  // Replace this with the correct selector for ContractAFacet.getter
+          contractAFacet.interface.getSighash("setter(uint256)"),
+          contractAFacet.interface.getSighash("getter()")
         ]
       }
     ],
@@ -37,12 +44,18 @@ async function main() {
 
   await diamondCutTx.wait();
 
-  console.log("DiamondCut executed");
+  console.log("DiamondCut executed for ContractAFacet");
 
-  // Optionally, verify that the facets are correctly attached
-  const diamondLoupe = await hre.ethers.getContractAt("IDiamondLoupe", diamond.address);
-  const facets = await diamondLoupe.facets();
-  console.log("Facets:", facets);
+  // Save addresses to addresses.json
+  const fs = require('fs');
+  const addresses = {
+    diamond: diamond.address,
+    contractAFacet: contractAFacet.address,
+    contractBFacet: contractBFacet.address  // Included for reference but not added to the Diamond
+  };
+  fs.writeFileSync('addresses.json', JSON.stringify(addresses, null, 2));
+
+  console.log("Addresses saved to addresses.json");
 }
 
 // We recommend this pattern to be able to use async/await everywhere

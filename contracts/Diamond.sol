@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/IDiamondCut.sol";
@@ -127,4 +127,22 @@ contract Diamond is IDiamondCut, IDiamondLoupe, IERC173, Ownable {
     function owner() public view override(Ownable, IERC173) returns (address) {
         return super.owner();
     }
+
+    // Fallback function for delegation
+    fallback() external payable {
+        DiamondStorage storage ds_ = ds;
+        bytes4 functionSelector = bytes4(msg.data[:4]);
+        address facet = ds_.functionSelectorToFacet[functionSelector];
+        require(facet != address(0), "Diamond: Function does not exist");
+
+        (bool success, bytes memory result) = facet.delegatecall(msg.data);
+        require(success, "Diamond: Delegatecall failed");
+
+        assembly {
+            return(add(result, 32), mload(result))
+        }
+    }
+
+    // Receive function for receiving ETH
+    receive() external payable {}
 }

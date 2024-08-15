@@ -31,6 +31,6 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: [process.env.BNB_API_KEY],
+    apiKey: process.env.BNB_API_KEY,
   },
 }

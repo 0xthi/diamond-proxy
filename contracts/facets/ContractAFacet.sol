@@ -5,7 +5,20 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {DiamondStorage} from "../libraries/DiamondStorage.sol";
 
 contract ContractAFacet is ReentrancyGuard {
-    function setter(uint256 num) external nonReentrant {
+    modifier onlyAdmin() {
+        DiamondStorage.DiamondStorageStruct storage ds = DiamondStorage.diamondStorage();
+        require(ds.admins[msg.sender], "Not an admin");
+        _;
+    }
+
+    function initialize(address admin) external {
+        DiamondStorage.DiamondStorageStruct storage ds = DiamondStorage.diamondStorage();
+        require(!ds.initialized, "Already initialized");
+        ds.admins[admin] = true;
+        ds.initialized = true;
+    }
+
+    function setter(uint256 num) external nonReentrant onlyAdmin {
         DiamondStorage.DiamondStorageStruct storage ds = DiamondStorage.diamondStorage();
         ds.variable += num;
     }
