@@ -26,32 +26,14 @@ async function main() {
 
   console.log("ContractBFacet deployed to:", contractBFacet.address);
 
-  // Add ContractAFacet to the Diamond
-  const diamondCutTx = await diamond.diamondCut(
-    [
-      {
-        facetAddress: contractAFacet.address,
-        action: 0,  // Add
-        functionSelectors: [
-          contractAFacet.interface.getSighash("setter(uint256)"),
-          contractAFacet.interface.getSighash("getter()")
-        ]
-      }
-    ],
-    hre.ethers.constants.AddressZero,  // No init function
-    "0x"  // No calldata
-  );
-
-  await diamondCutTx.wait();
-
-  console.log("DiamondCut executed for ContractAFacet");
+  // No facet is added to the Diamond in this script
 
   // Save addresses to addresses.json
   const fs = require('fs');
   const addresses = {
     diamond: diamond.address,
     contractAFacet: contractAFacet.address,
-    contractBFacet: contractBFacet.address  // Included for reference but not added to the Diamond
+    contractBFacet: contractBFacet.address
   };
   fs.writeFileSync('addresses.json', JSON.stringify(addresses, null, 2));
 

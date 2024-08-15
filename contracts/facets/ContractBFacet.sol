@@ -24,7 +24,7 @@ contract ContractBFacet {
     }
 
     // Initialize function to replace constructor
-    function initialize(address _superAdmin) external {
+    function initializeContractBFacet(address _superAdmin) external {
         DiamondStorage.DiamondStorageStruct storage ds = DiamondStorage.diamondStorage();
         require(!ds.initialized, "Already initialized");
         require(_superAdmin != address(0), "Invalid super admin address");

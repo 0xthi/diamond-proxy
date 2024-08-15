@@ -11,7 +11,7 @@ contract ContractAFacet is ReentrancyGuard {
         _;
     }
 
-    function initialize(address admin) external {
+    function initializeContractAFacet(address admin) external {
         DiamondStorage.DiamondStorageStruct storage ds = DiamondStorage.diamondStorage();
         require(!ds.initialized, "Already initialized");
         ds.admins[admin] = true;
@@ -20,7 +20,7 @@ contract ContractAFacet is ReentrancyGuard {
 
     function setter(uint256 num) external nonReentrant onlyAdmin {
         DiamondStorage.DiamondStorageStruct storage ds = DiamondStorage.diamondStorage();
-        ds.variable += num;
+        ds.variable = num;  // Directly set the variable to the input value
     }
 
     function getter() external view returns (uint256) {
